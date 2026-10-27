@@ -1,1 +1,47 @@
-<!doctype html><html lang="es"><head><meta charset="utf-8"><title>Buscador de puntos</title></head><body></body></html>
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Buscador de puntos</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+        background: transparent;
+        font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      }
+      buscador-puntos {
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <!--
+      Alternativa para gestores de contenidos que filtran scripts. Desde la web:
+      <iframe src="https://TU-DOMINIO/iframe.html?src=https://TU-DOMINIO/puntos.json"
+              title="Buscador de puntos" width="100%" height="650" style="border:0" loading="lazy"></iframe>
+      Parámetros opcionales: src, tile, centro, zoom, logo, atribucion (equivalen a los data-* del componente).
+    -->
+    <buscador-puntos id="buscador" data-altura="100vh"></buscador-puntos>
+    <script>
+      (function () {
+        var q = new URLSearchParams(location.search);
+        var el = document.getElementById("buscador");
+        var atributos = {
+          src: "data-src",
+          tile: "data-tile-url",
+          centro: "data-centro",
+          zoom: "data-zoom",
+          logo: "data-logo",
+          atribucion: "data-atribucion",
+        };
+        Object.keys(atributos).forEach(function (k) {
+          if (q.get(k)) el.setAttribute(atributos[k], q.get(k));
+        });
+      })();
+    </script>
+    <script src="buscador-puntos.js"></script>
+  </body>
+</html>

@@ -1,1 +1,123 @@
-<!doctype html><title>demo</title>
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Web del ayuntamiento (página anfitriona de prueba)</title>
+    <!--
+      Esta página imita a una web con CSS AGRESIVO: reset global, tipografías y colores propios,
+      html a 62,5 % (1rem = 10px), estilos para button, input, a, h1-h3, box-sizing global…
+      El widget se incrusta con DOS líneas (ver el final del <body>) y no debe verse afectado.
+      Para verla: npm run demo   (construye y abre http://localhost:4173/demo/pagina-anfitriona.html)
+    -->
+    <style>
+      html {
+        font-size: 62.5%;
+      }
+      * {
+        box-sizing: content-box !important;
+        margin: 0;
+        padding: 0;
+        font-family: Georgia, "Times New Roman", serif;
+        color: #5b21b6 !important;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        text-align: center;
+        line-height: 2.6;
+      }
+      body {
+        font-size: 1.7rem;
+        background: #fef3c7;
+      }
+      header,
+      main,
+      footer {
+        display: block;
+        padding: 2rem;
+        border: 0.6rem double #be185d;
+        margin: 1.6rem;
+        background: #fde68a;
+      }
+      h1,
+      h2,
+      h3 {
+        font-family: Impact, "Arial Black", sans-serif;
+        color: #be185d !important;
+        font-size: 3.2rem;
+        text-shadow: 3px 3px 0 #fff;
+        border-bottom: 0.6rem solid #be185d;
+      }
+      a {
+        color: #dc2626 !important;
+        text-decoration: line-through;
+        font-size: 2.2rem;
+        font-weight: 900;
+      }
+      button {
+        all: unset;
+        display: block;
+        background: hotpink !important;
+        border: 0.4rem dotted lime !important;
+        color: yellow !important;
+        font: 700 2.8rem Impact, sans-serif !important;
+        padding: 2rem;
+        cursor: crosshair;
+      }
+      input {
+        height: 8rem;
+        border: 0.5rem double red !important;
+        border-radius: 0 !important;
+        background: #ffe4e6 !important;
+        font-size: 3rem !important;
+      }
+      ul,
+      li {
+        list-style: square inside;
+        background: #bbf7d0;
+      }
+      img,
+      svg {
+        filter: grayscale(1) blur(2px);
+        opacity: 0.5;
+      }
+      .estrecho {
+        width: 320px;
+        margin: 0 auto;
+        outline: 2px dashed #be185d;
+      }
+      .marca-verde {
+        --bp-color-primario: #0b7a3b;
+        --bp-color-acento: #f97316;
+        --bp-radio: 2px;
+        --bp-fuente: "Courier New", monospace;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Ayuntamiento de Ejemplo</h1>
+      <a href="#">Inicio</a> · <a href="#">Servicios</a> · <a href="#">Contacto</a>
+      <button type="button">Botón de la web anfitriona</button>
+      <input type="text" value="Un input de la web anfitriona" aria-label="Campo de la web anfitriona" />
+    </header>
+
+    <main>
+      <h2>Dónde acudir</h2>
+
+      <!-- LAS DOS LÍNEAS DE INTEGRACIÓN -->
+      <script src="../embed/buscador-puntos.js" defer></script>
+      <buscador-puntos data-src="../puntos.json" data-altura="640px"></buscador-puntos>
+
+      <h2>Misma página, contenedor estrecho (320 px) y otra marca</h2>
+      <p>Segunda instancia en la misma página, con colores y tipografía propios mediante variables CSS.</p>
+      <div class="estrecho marca-verde">
+        <buscador-puntos data-src="../puntos.json" data-zoom="12" data-centro="12.136,-86.251"></buscador-puntos>
+      </div>
+    </main>
+
+    <footer>
+      <h3>Pie de la web anfitriona</h3>
+      <a href="#">Aviso legal</a>
+    </footer>
+  </body>
+</html>

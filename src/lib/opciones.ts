@@ -76,7 +76,7 @@ export function opcionesDesdeAtributos(leer: Lector): OpcionesBuscador {
   return {
     src: urlSegura(leer("data-src")) ?? OPCIONES_POR_DEFECTO.src,
     tileUrl: tileUrl ?? TILE_URL_POR_DEFECTO,
-    atribucion: atribucionPropia ? escaparHtml(atribucionPropia) : tileUrl ? "" : ATRIBUCION_OSM,
+    atribucion: atribucionPropia ? escaparHtml(atribucionPropia) : ATRIBUCION_OSM,
     centro: parsearCentro(leer("data-centro")),
     zoom: parsearZoom(leer("data-zoom")),
     altura: parsearAltura(leer("data-altura")),
