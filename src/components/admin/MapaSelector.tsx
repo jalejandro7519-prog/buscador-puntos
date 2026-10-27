@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { Map as LMap, Marker } from "leaflet";
 import leafletCss from "leaflet/dist/leaflet.css?inline";
-import { estiloMarcador, svgMarcador } from "../../lib/marcadores";
+import { estiloMarcador, opcionesIcono } from "../../lib/marcadores";
 import { CENTRO_POR_DEFECTO, TILE_URL_POR_DEFECTO } from "../../lib/opciones";
 
 type Leaflet = typeof import("leaflet");
@@ -70,7 +70,7 @@ export default function MapaSelector({ lat, lng, onCambio }: Props) {
         draggable: true,
         keyboard: true,
         title: "Ubicación del punto: arrástrala para ajustarla",
-        icon: L.divIcon({ html: svgMarcador(e), className: "bp-marcador", iconSize: [e.tam, e.tam], iconAnchor: [e.tam / 2, e.tam / 2] }),
+        icon: L.divIcon(opcionesIcono(e)),
       }).addTo(mapa);
       m.on("dragend", () => {
         const p = m.getLatLng();

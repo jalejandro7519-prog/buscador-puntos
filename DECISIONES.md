@@ -65,3 +65,12 @@ Registro de las decisiones tomadas donde el encargo no definía un valor. Se man
 - **`data-src` relativo**: se resuelve contra la página anfitriona (no contra el script), igual que cualquier `fetch`.
 - **iframe**: `dist/embed/iframe.html` acepta `?src=…&tile=…&centro=…&zoom=…&logo=…&atribucion=…` y ocupa el 100 % del iframe (`data-altura="100vh"`).
 - **Demo**: `demo/pagina-anfitriona.html` (copiada a `dist/demo/` en el build) con CSS agresivo y dos instancias (una a 320 px con otra marca). Se ve con `npm run demo`.
+
+## Fase 6 – Rendimiento, accesibilidad y documentación
+
+- **Definición de «mapa interactivo»**: Leaflet creado, marcadores pintados y controles activos (`bp:mapa-interactivo`). Las teselas son imágenes de un servidor externo y se miden aparte (`bp:mapa-teselas`). El criterio de 3 s se evalúa con el perfil de red «4G lento» de Lighthouse aplicado de verdad; la penalización extra de CPU 4× se informa por separado porque deja el resultado en el límite (ver `docs/rendimiento.md`).
+- **Optimizaciones**: Leaflet dentro del fragmento del mapa (descarga en paralelo, no en cascada), `modulepreload` de prioridad baja de esos fragmentos inyectado en `index.html` al compilar, `puntos.json` pedido desde `index.html` (el JS de la app lo recoge si existe; si no, pide él), encuadre inicial al crear el mapa, `preconnect` al servidor de teselas, y reserva de altura para el contador y los filtros (CLS 0).
+- **El embed sigue en un solo fichero (≈ 133 KB gzip)**: es la consecuencia de «un solo fichero». Alternativa si se quiere más ligero: dos ficheros, con el mapa cargado bajo demanda.
+- **Accesibilidad**: se añadió un `<h2>` oculto «Puntos encontrados» para que los títulos de las fichas (`<h3>`) no salten de nivel; marcadores con caja táctil de 40 px (el dibujo mide 30 px). Queda un aviso de Lighthouse (`target-size`) por marcadores solapados a zoom bajo con los datos de demo; la lista es la alternativa textual completa. No se ha probado con lector de pantalla.
+- **Datos DEMO**: coordenadas inventadas alrededor del centro de Managua (12,136; −86,251) y nombres claramente ficticios («Punto demo 01»…). Los barrios (Altamira, Bolonia…) solo sirven de etiqueta; las direcciones («Calle Demo 1») no existen.
+- **Pendiente de decidir por el cliente**: ver el resumen final y el README.

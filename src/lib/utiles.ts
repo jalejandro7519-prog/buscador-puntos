@@ -24,6 +24,24 @@ export function hrefTelefono(telefono: string): string {
   return `tel:${telefono.replace(/[^\d+]/g, "")}`;
 }
 
+/** Abre ya la conexión con el servidor de teselas (DNS + TLS) para que las primeras no esperen. */
+export function preconectar(plantillaUrl: string): void {
+  try {
+    const origen = new URL(plantillaUrl.replace(/\{[a-z]\}/g, "0"), location.href).origin;
+    if (origen === location.origin) return;
+    const yaHay = Array.from(document.head.querySelectorAll<HTMLLinkElement>("link[rel=preconnect]")).some(
+      (l) => l.href.replace(/\/$/, "") === origen,
+    );
+    if (yaHay) return;
+    const enlace = document.createElement("link");
+    enlace.rel = "preconnect";
+    enlace.href = origen;
+    document.head.append(enlace);
+  } catch {
+    /* sin DOM o URL no válida: solo es una optimización */
+  }
+}
+
 export function useDebounced<T>(valor: T, ms: number): T {
   const [debounced, setDebounced] = useState(valor);
   useEffect(() => {

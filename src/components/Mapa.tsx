@@ -1,15 +1,21 @@
 import { useEffect, useRef, useState } from "react";
+import * as Lf from "leaflet";
 import type { LayerGroup, Map as LMap, Marker } from "leaflet";
 import leafletCss from "leaflet/dist/leaflet.css?inline";
 import type { Plataforma } from "../lib/directions";
 import type { Punto } from "../lib/esquema";
 import type { Coord, PuntoConDistancia } from "../lib/geo";
-import { estiloMarcador, svgGrupo, svgMarcador } from "../lib/marcadores";
+import { estiloMarcador, opcionesIcono, svgGrupo } from "../lib/marcadores";
 import { CENTRO_POR_DEFECTO, UMBRAL_AGRUPACION, ZOOM_SIN_AGRUPAR } from "../lib/opciones";
 import { reducirMovimiento } from "../lib/utiles";
 import { crearPopupDom } from "./popupDom";
 
-type Leaflet = typeof import("leaflet");
+type Leaflet = typeof Lf;
+
+// Este módulo ya es un fragmento diferido (MapaDiferido lo importa con import()): Leaflet viaja con él
+// y el navegador descarga ambos EN PARALELO en vez de uno detrás de otro.
+// Leaflet se asigna siempre a window.L al cargar: se devuelve el valor previo para no pisar al anfitrión.
+Lf.noConflict();
 
 export interface PropsMapa {
   /** Los puntos de la lista filtrada: el mapa muestra exactamente estos. */
@@ -42,6 +48,7 @@ export default function Mapa(props: PropsMapa) {
   const seleccionActual = useRef<string | null>(null);
   const pendienteAbrir = useRef<string | null>(null);
   const claveAjuste = useRef<string | null>(null);
+  const listoAvisado = useRef(false);
 
   // 1) Crear el mapa (Leaflet se carga aquí, con import() dinámico).
   useEffect(() => {
@@ -51,19 +58,23 @@ export default function Mapa(props: PropsMapa) {
 
     (async () => {
       try {
-        const modulo = await import("leaflet");
-        const Lf = ("default" in modulo ? modulo.default : modulo) as Leaflet;
-        // Leaflet se asigna a window.L al cargar: se devuelve el valor previo para no pisar al anfitrión.
-        Lf.noConflict();
         const contenedor = lienzo.current;
         if (cancelado || !contenedor) return;
 
-        const { centro, zoom, tileUrl, atribucion } = ultimas.current;
-        const inicial = centro ?? CENTRO_POR_DEFECTO;
-        const m = Lf.map(contenedor, { zoomControl: true, worldCopyJump: false }).setView(
-          [inicial.lat, inicial.lng],
-          zoom ?? 13,
-        );
+        const { centro, zoom, tileUrl, atribucion, puntos: iniciales } = ultimas.current;
+        const m = Lf.map(contenedor, { zoomControl: true, worldCopyJump: false });
+        if (!centro && iniciales.length > 0) {
+          // Vista final desde el principio: las teselas se piden una sola vez (no 13 y luego 12).
+          m.fitBounds(Lf.latLngBounds(iniciales.map((i) => [i.punto.lat, i.punto.lng] as [number, number])), {
+            padding: [32, 32],
+            maxZoom: 16,
+            animate: false,
+          });
+          claveAjuste.current = iniciales.map((i) => i.punto.id).join("|");
+        } else {
+          const inicial = centro ?? CENTRO_POR_DEFECTO;
+          m.setView([inicial.lat, inicial.lng], zoom ?? 13);
+        }
         const teselas = Lf.tileLayer(tileUrl, { attribution: atribucion, maxZoom: 19 }).addTo(m);
         teselas.once("load", () => performance.mark?.("bp:mapa-teselas"));
 
@@ -74,10 +85,6 @@ export default function Mapa(props: PropsMapa) {
         instancia = m;
         setL(Lf);
         setMapa(m);
-        m.whenReady(() => {
-          performance.mark?.("bp:mapa-listo");
-          ultimas.current.onListo();
-        });
       } catch (error) {
         if (!cancelado) ultimas.current.onFallo(error);
       }
@@ -97,16 +104,7 @@ export default function Mapa(props: PropsMapa) {
     let cancelado = false;
     let quitarZoom: (() => void) | undefined;
 
-    const icono = (p: Punto, seleccionado: boolean) => {
-      const e = estiloMarcador(p, seleccionado);
-      return L.divIcon({
-        html: svgMarcador(e),
-        className: "bp-marcador",
-        iconSize: [e.tam, e.tam],
-        iconAnchor: [e.tam / 2, e.tam / 2],
-        popupAnchor: [0, -e.tam / 2],
-      });
-    };
+    const icono = (p: Punto, seleccionado: boolean) => L.divIcon(opcionesIcono(estiloMarcador(p, seleccionado)));
 
     items.current = new Map(puntos.map((i) => [i.punto.id, i]));
     const grupoCapa = capa.current ?? (capa.current = L.layerGroup().addTo(mapa));
@@ -161,6 +159,14 @@ export default function Mapa(props: PropsMapa) {
 
       construir();
 
+      // «Mapa interactivo»: creado, con los marcadores pulsables y los controles activos (las teselas
+      // siguen llegando por su cuenta; su marca aparte es bp:mapa-teselas).
+      if (!listoAvisado.current) {
+        listoAvisado.current = true;
+        performance.mark?.("bp:mapa-interactivo");
+        ultimas.current.onListo();
+      }
+
       // Encuadre: solo cuando cambia el conjunto de puntos (no al renovar los mismos datos).
       const clave = puntos.map((i) => i.punto.id).join("|");
       if (clave !== claveAjuste.current) {
@@ -196,16 +202,7 @@ export default function Mapa(props: PropsMapa) {
       const marcador = id ? marcadores.current.get(id) : undefined;
       const item = id ? items.current.get(id) : undefined;
       if (!marcador || !item) return;
-      const e = estiloMarcador(item.punto, seleccionado);
-      marcador.setIcon(
-        L.divIcon({
-          html: svgMarcador(e),
-          className: "bp-marcador",
-          iconSize: [e.tam, e.tam],
-          iconAnchor: [e.tam / 2, e.tam / 2],
-          popupAnchor: [0, -e.tam / 2],
-        }),
-      );
+      marcador.setIcon(L.divIcon(opcionesIcono(estiloMarcador(item.punto, seleccionado))));
       marcador.setZIndexOffset(seleccionado ? 1000 : item.punto.estado === "cerrado_temporal" ? -100 : 0);
     };
 

@@ -25,6 +25,20 @@ export function estiloMarcador(punto: Pick<Punto, "estado">, seleccionado: boole
   };
 }
 
+/** Caja táctil del marcador (el dibujo es menor): más fácil de pulsar con el dedo. */
+export const CAJA_MARCADOR = 40;
+
+/** Opciones de `L.divIcon` para un marcador (sin depender de Leaflet, para poder probarlo). */
+export function opcionesIcono(e: EstiloMarcador) {
+  return {
+    html: svgMarcador(e),
+    className: "bp-marcador",
+    iconSize: [CAJA_MARCADOR, CAJA_MARCADOR] as [number, number],
+    iconAnchor: [CAJA_MARCADOR / 2, CAJA_MARCADOR / 2] as [number, number],
+    popupAnchor: [0, -e.tam / 2] as [number, number],
+  };
+}
+
 /** SVG ligero (sin imágenes externas). Los colores van en `style` para admitir var(). */
 export function svgMarcador(e: EstiloMarcador): string {
   const anchoBorde = e.seleccionado ? 4 : 3;

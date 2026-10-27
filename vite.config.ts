@@ -14,6 +14,31 @@ const remAPx = {
   },
 };
 
+/**
+ * Avisa al navegador de los fragmentos del mapa con prioridad BAJA: se descargan mientras el
+ * navegador trabaja con lo inicial, sin competir con él; el mapa se monta después del primer pintado.
+ */
+function precargarMapa(): Plugin {
+  let base = "/";
+  return {
+    name: "precargar-fragmentos-del-mapa",
+    configResolved(config) {
+      base = config.base;
+    },
+    transformIndexHtml: {
+      order: "post",
+      handler(_html, ctx) {
+        const nombres = Object.keys(ctx.bundle ?? {}).filter((n) => /^assets\/(Mapa|leaflet-src|marcadores)-.*\.js$/.test(n));
+        return nombres.map((n) => ({
+          tag: "link",
+          attrs: { rel: "modulepreload", crossorigin: true, href: `${base}${n}`, fetchpriority: "low" },
+          injectTo: "head" as const,
+        }));
+      },
+    },
+  };
+}
+
 /** Emite iframe.html junto al bundle embebible (alternativa si el CMS filtra scripts). */
 function iframeHtml(): Plugin {
   return {
@@ -31,7 +56,7 @@ function iframeHtml(): Plugin {
 export default defineConfig(({ mode }) => {
   const embed = mode === "embed";
   return {
-    plugins: [react(), ...(embed ? [iframeHtml()] : [])],
+    plugins: [react(), ...(embed ? [iframeHtml()] : [precargarMapa()])],
     css: embed ? { postcss: { plugins: [tailwindcss(), autoprefixer(), remAPx] } } : undefined,
     define: embed ? { "process.env.NODE_ENV": JSON.stringify("production") } : undefined,
     build: embed

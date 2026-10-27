@@ -84,9 +84,30 @@ export function guardarSesionAdmin(activa: boolean): void {
   else borrar(sesion, CLAVE_SESION_ADMIN);
 }
 
+/** Petición adelantada por un script de index.html (solo la app autónoma): ahorra un viaje de red. */
+interface Precarga {
+  src: string;
+  promesa: Promise<Response | null>;
+}
+declare global {
+  interface Window {
+    __bpPrecarga?: Precarga;
+  }
+}
+
+async function pedir(src: string, signal?: AbortSignal): Promise<Response> {
+  const pre = typeof window === "undefined" ? undefined : window.__bpPrecarga;
+  if (pre && pre.src === src) {
+    window.__bpPrecarga = undefined; // se usa una sola vez; los reintentos van por la red
+    const respuesta = await pre.promesa;
+    if (respuesta?.ok) return respuesta;
+  }
+  return fetch(src, { cache: "no-cache", signal });
+}
+
 /** Descarga y valida `puntos.json`. Lanza si la petición o la estructura fallan. */
 export async function cargarPuntos(src: string, signal?: AbortSignal): Promise<ResultadoParseo> {
-  const respuesta = await fetch(src, { cache: "no-cache", signal });
+  const respuesta = await pedir(src, signal);
   if (!respuesta.ok) throw new Error(`No se pudo cargar ${src} (HTTP ${respuesta.status})`);
   return parsearArchivo(await respuesta.json());
 }

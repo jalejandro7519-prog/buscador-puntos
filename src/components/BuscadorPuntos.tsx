@@ -77,15 +77,24 @@ export function BuscadorPuntos(props: PropsBuscador) {
             buscandoUbicacion={ubicacion.estado === "buscando"}
             onAlternarCerca={alternarCerca}
           />
-          <Filtros tipos={tipos} seleccionados={tiposActivos} onCambio={setTiposElegidos} />
-
-          {!sinDatos && (
-            <p className="bp-contador" role="status" aria-live="polite">
-              <strong>{pluralPuntos(resultado.items.length)}</strong>
-              {resultado.modo === "codigoPostal" && <> · ordenados por distancia al código postal {resultado.codigoPostal}</>}
-              {resultado.modo === "cercania" && <> · ordenados por cercanía a tu ubicación</>}
-            </p>
+          {cargandoSinDatos ? (
+            <div className="bp-reserva" aria-hidden="true" />
+          ) : (
+            <Filtros tipos={tipos} seleccionados={tiposActivos} onCambio={setTiposElegidos} />
           )}
+
+          {/* Siempre presente (aunque vacío) para que el mapa no salte cuando llegan los datos. */}
+          <p className="bp-contador" role="status" aria-live="polite">
+            {sinDatos ? (
+              " "
+            ) : (
+              <>
+                <strong>{pluralPuntos(resultado.items.length)}</strong>
+                {resultado.modo === "codigoPostal" && <> · ordenados por distancia al código postal {resultado.codigoPostal}</>}
+                {resultado.modo === "cercania" && <> · ordenados por cercanía a tu ubicación</>}
+              </>
+            )}
+          </p>
 
           {resultado.codigoPostalInexistente && (
             <p className="bp-aviso" role="status">
@@ -140,6 +149,7 @@ export function BuscadorPuntos(props: PropsBuscador) {
         )}
 
         <div className="bp-lista">
+          <h2 className="bp-sr">Puntos encontrados</h2>
           {cargandoSinDatos && (
             <div aria-busy="true" aria-label="Cargando puntos" className="bp-esqueleto-lista">
               {[0, 1, 2].map((i) => (

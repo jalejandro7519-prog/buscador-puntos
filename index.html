@@ -4,9 +4,22 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Buscador de puntos</title>
+    <link rel="preconnect" href="https://tile.openstreetmap.org" />
     <meta name="description" content="Encuentra el punto más cercano, su horario y cómo llegar." />
   </head>
   <body>
+    <!-- Adelanta la petición de puntos.json: no espera a que el JS de la app se descargue y ejecute. -->
+    <script>
+      (function () {
+        var src = "%BASE_URL%puntos.json";
+        window.__bpPrecarga = {
+          src: src,
+          promesa: fetch(src, { cache: "no-cache" }).catch(function () {
+            return null;
+          }),
+        };
+      })();
+    </script>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

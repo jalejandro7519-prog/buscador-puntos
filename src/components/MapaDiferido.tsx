@@ -1,4 +1,5 @@
 import { Suspense, lazy, useCallback, useEffect, useRef, useState } from "react";
+import { preconectar } from "../lib/utiles";
 import { ErrorBoundary } from "./ErrorBoundary";
 import type { PropsMapa } from "./Mapa";
 
@@ -20,6 +21,8 @@ type Props = Omit<PropsMapa, "onListo" | "onFallo"> & {
 export function MapaDiferido({ onEstado, ...props }: Props) {
   const contenedor = useRef<HTMLDivElement>(null);
   const [estado, setEstado] = useState<EstadoMapa>("espera");
+  const { tileUrl } = props;
+  useEffect(() => preconectar(tileUrl), [tileUrl]);
 
   const cambiar = useCallback(
     (nuevo: EstadoMapa) => {
@@ -37,7 +40,9 @@ export function MapaDiferido({ onEstado, ...props }: Props) {
     let temporizador: ReturnType<typeof setTimeout> | undefined;
 
     const activar = () => {
-      if (!cancelado) cambiar("cargando");
+      if (cancelado) return;
+      void import("./Mapa"); // se pide ya; React.lazy reutiliza la misma promesa
+      cambiar("cargando");
     };
     const cuandoVisible = () => {
       if (cancelado) return;
@@ -58,7 +63,7 @@ export function MapaDiferido({ onEstado, ...props }: Props) {
     };
 
     if (typeof requestIdleCallback === "function") {
-      idle = requestIdleCallback(cuandoVisible, { timeout: 1500 });
+      idle = requestIdleCallback(cuandoVisible, { timeout: 50 });
     } else {
       temporizador = setTimeout(cuandoVisible, 200);
     }
