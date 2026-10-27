@@ -84,3 +84,10 @@ export function opcionesDesdeAtributos(leer: Lector): OpcionesBuscador {
     logo: urlSegura(leer("data-logo")),
   };
 }
+
+/** Por encima de este número de puntos el mapa agrupa marcadores (con carga diferida). */
+export const UMBRAL_AGRUPACION = 300;
+/** A partir de este zoom ya no se agrupa. */
+export const ZOOM_SIN_AGRUPAR = 16;
+/** Centro inicial si no hay `data-centro` ni puntos: Managua. */
+export const CENTRO_POR_DEFECTO = { lat: 12.136, lng: -86.251 } as const;

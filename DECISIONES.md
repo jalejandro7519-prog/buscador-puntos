@@ -29,3 +29,15 @@ Registro de las decisiones tomadas donde el encargo no definía un valor. Se man
 - **Errores**: sin datos ni caché → mensaje con «Reintentar»; con caché → se muestra la última lista y un aviso discreto con «Reintentar». Los puntos inválidos se descartan solo en consola (el aviso visible será del panel).
 - **Debounce** de 150 ms en la caja de búsqueda; al vaciar con «Quitar búsqueda y filtros» el listado vuelve tras ese mismo intervalo.
 - **Accesibilidad**: `lang="es"`, `<ul>` semántico, contador en `role="status"` (aria-live polite), filtros como `aria-pressed`, `useId` para etiquetas (válido con dos instancias).
+
+## Fase 3 – Mapa
+
+- **Carga diferida**: el listado se pinta primero. `MapaDiferido` espera a `requestIdleCallback` (respaldo: `setTimeout` 200 ms) y a que el contenedor esté a ≤ 200 px de la zona visible (`IntersectionObserver`, respaldo: inmediato). El código del mapa y Leaflet son un fragmento aparte (`Mapa-*.js` + `leaflet-*.js`, ≈ 53 KB gzip) que nunca entra en el bundle inicial; mientras tanto se ve un esqueleto.
+- **Fallos**: error boundary + `try/catch` en el montaje → estado `fallo` (el panel del mapa desaparece y el listado ocupa todo el ancho). Si en 6 s no está listo → estado `tarde` (aviso «El mapa no está disponible ahora», pero se deja terminar de cargar; si llega, el mapa aparece). En ambos casos búsqueda, filtros y «Cómo llegar» siguen funcionando.
+- **Leaflet no pisa `window.L`**: Leaflet se asigna siempre a `window.L`; tras importarlo se llama a `L.noConflict()` para devolver el valor previo (importante en el embed: la web anfitriona puede tener su propio Leaflet).
+- **Marcadores**: `divIcon` con SVG en línea (sin imágenes). Color por `var(--bp-color-primario)`. Cerrados: gris `#6B7280` con icono de pausa; seleccionado: mayor tamaño y borde de acento. Los colores van en `style` (no en atributos de presentación) para que `var()` funcione en todos los navegadores.
+- **Fichas del popup**: se construyen con `createElement`/`textContent` (nunca `innerHTML`), así que los datos del JSON no pueden inyectar HTML.
+- **Encuadre**: `fitBounds` solo cuando cambia el *conjunto* de puntos visibles (filtros, búsqueda), no al renovar los mismos datos. Con `data-centro`/`data-zoom` se respeta esa vista en la carga inicial.
+- **Agrupación (> 300 puntos)**: agrupación propia por celdas de 60 px en proyección Web Mercator (`lib/agrupar.ts`, ≈ 0,4 KB gzip, `import()` dinámico solo si se supera el umbral) en lugar de `leaflet.markercluster`, que exige `window.L` global y añade ~10 KB. Por encima del zoom 16 no se agrupa.
+- **Medición**: el mapa deja `performance.mark("bp:mapa-listo")` y `"bp:mapa-teselas"` (primeras teselas pintadas).
+- **Filtros en móvil**: una sola fila desplazable en contenedores estrechos para que el mapa quede visible sin hacer scroll.

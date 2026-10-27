@@ -40,7 +40,7 @@ const puntos = Array.from({ length: 24 }, (_, i) => {
     id: slug(nombre, zona.cp),
     nombre,
     tipo: TIPOS[(i + Math.floor(i / 6)) % TIPOS.length],
-    direccion: `Calle Demo ${i + 1}, ${zona.ciudad}`,
+    direccion: `Calle Demo ${i + 1}`,
     codigoPostal: zona.cp,
     ciudad: zona.ciudad,
     lat: redondear(zona.lat + (((i * 37) % 11) - 5) * 0.0009),
@@ -105,19 +105,19 @@ writeFileSync("public/ejemplo-hoja.csv", "﻿" + hoja.join("\n") + "\n");
 const base = puntos.slice(0, 5).map(filaDePunto);
 const problemas = [
   // Coma decimal (válida)
-  fila(["Punto demo 31 (coma decimal)", TIPOS[0], "Calle Demo 31, Altamira", "11001", "Altamira", "", "L-V 8:00-16:00", crudo('"12,1364"'), crudo('"-86,2510"'), "abierto", "", ""]),
+  fila(["Punto demo 31 (coma decimal)", TIPOS[0], "Calle Demo 31", "11001", "Altamira", "", "L-V 8:00-16:00", crudo('"12,1364"'), crudo('"-86,2510"'), "abierto", "", ""]),
   // Coordenadas vacías
-  fila(["Punto demo 32 (sin coordenadas)", TIPOS[1], "Calle Demo 32, Bolonia", "11003", "Bolonia", "", "", "", "", "abierto", "", ""]),
+  fila(["Punto demo 32 (sin coordenadas)", TIPOS[1], "Calle Demo 32", "11003", "Bolonia", "", "", "", "", "abierto", "", ""]),
   // Latitud no numérica
-  fila(["Punto demo 33 (lat. ilegible)", TIPOS[2], "Calle Demo 33, Linda Vista", "11002", "Linda Vista", "", "", "doce coma uno", "-86.27", "abierto", "", ""]),
+  fila(["Punto demo 33 (lat. ilegible)", TIPOS[2], "Calle Demo 33", "11002", "Linda Vista", "", "", "doce coma uno", "-86.27", "abierto", "", ""]),
   // Fuera de rango, con lat/lng intercambiadas
-  fila(["Punto demo 34 (intercambiadas fuera de rango)", TIPOS[3], "Calle Demo 34, Altamira", "11001", "Altamira", "", "", "-86.2511", "125.5", "abierto", "", ""]),
+  fila(["Punto demo 34 (intercambiadas fuera de rango)", TIPOS[3], "Calle Demo 34", "11001", "Altamira", "", "", "-86.2511", "125.5", "abierto", "", ""]),
   // Intercambiadas pero dentro de rango (solo se detecta por estar lejos del resto)
-  fila(["Punto demo 35 (intercambiadas)", TIPOS[0], "Calle Demo 35, Bolonia", "11003", "Bolonia", "", "", "-86.2511", "12.1364", "abierto", "", ""]),
+  fila(["Punto demo 35 (intercambiadas)", TIPOS[0], "Calle Demo 35", "11003", "Bolonia", "", "", "-86.2511", "12.1364", "abierto", "", ""]),
   // Sin nombre
-  fila(["", TIPOS[1], "Calle Demo 36, Villa Fontana", "11005", "Villa Fontana", "", "", "12.1651", "-86.2402", "abierto", "", ""]),
+  fila(["", TIPOS[1], "Calle Demo 36", "11005", "Villa Fontana", "", "", "12.1651", "-86.2402", "abierto", "", ""]),
   // Coordenadas con espacios y punto decimal (válida)
-  fila(["Punto demo 37 (con espacios)", TIPOS[2], "Calle Demo 37, Altamira", "11001", "Altamira", "", "", " 12.1390 ", " -86.2540 ", "cerrado temporal", "Obras", ""]),
+  fila(["Punto demo 37 (con espacios)", TIPOS[2], "Calle Demo 37", "11001", "Altamira", "", "", " 12.1390 ", " -86.2540 ", "cerrado temporal", "Obras", ""]),
 ];
 writeFileSync("public/ejemplo-hoja-con-errores.csv", "﻿" + [fila(CABECERA), ...base, ...problemas].join("\n") + "\n");
 

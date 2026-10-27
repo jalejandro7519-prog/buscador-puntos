@@ -7,6 +7,7 @@ import { pluralPuntos, useDebounced } from "../lib/utiles";
 import { CajaBusqueda } from "./CajaBusqueda";
 import { Filtros } from "./Filtros";
 import { Listado } from "./Listado";
+import { MapaDiferido, type EstadoMapa } from "./MapaDiferido";
 
 export type PropsBuscador = Partial<OpcionesBuscador>;
 
@@ -25,6 +26,7 @@ export function BuscadorPuntos(props: PropsBuscador) {
   const textoBusqueda = useDebounced(texto, 150);
   const [tiposElegidos, setTiposElegidos] = useState<string[]>([]);
   const [seleccionadoId, setSeleccionadoId] = useState<string | null>(null);
+  const [estadoMapa, setEstadoMapa] = useState<EstadoMapa>("espera");
 
   const tipos = useMemo(() => tiposDisponibles(puntos), [puntos]);
   // Si tras renovar los datos un tipo deja de existir, deja de filtrar por él.
@@ -55,6 +57,7 @@ export function BuscadorPuntos(props: PropsBuscador) {
     setTiposElegidos([]);
   };
 
+  const conMapa = estadoMapa !== "fallo";
   const estilo = { "--bp-altura": opciones.altura } as CSSProperties;
 
   return (
@@ -65,7 +68,7 @@ export function BuscadorPuntos(props: PropsBuscador) {
         </header>
       )}
 
-      <div className="bp-rejilla bp-sin-mapa">
+      <div className={`bp-rejilla ${conMapa ? "" : "bp-sin-mapa"}`}>
         <div className="bp-controles">
           <CajaBusqueda
             valor={texto}
@@ -112,8 +115,29 @@ export function BuscadorPuntos(props: PropsBuscador) {
               </button>
             </p>
           )}
+          {(estadoMapa === "fallo" || estadoMapa === "tarde") && (
+            <p className="bp-aviso" role="status">
+              El mapa no está disponible ahora. Puedes seguir usando la lista.
+            </p>
+          )}
           {!sinDatos && fase === "cargando" && desdeCache && <p className="bp-sr">Actualizando la lista…</p>}
         </div>
+
+        {conMapa && (
+          <div className="bp-mapa">
+            <MapaDiferido
+              puntos={resultado.items}
+              seleccionadoId={seleccion}
+              onSeleccionar={setSeleccionadoId}
+              tileUrl={opciones.tileUrl}
+              atribucion={opciones.atribucion}
+              centro={opciones.centro}
+              zoom={opciones.zoom}
+              plataforma={plataforma}
+              onEstado={setEstadoMapa}
+            />
+          </div>
+        )}
 
         <div className="bp-lista">
           {cargandoSinDatos && (

@@ -6,6 +6,9 @@ import { crearArchivo, type Punto } from "../lib/esquema";
 import { punto } from "../test/fabrica";
 import { BuscadorPuntos } from "./BuscadorPuntos";
 
+// El mapa real se prueba aparte; aquí solo importa el listado.
+vi.mock("./Mapa", () => ({ default: () => null }));
+
 const DATOS: Punto[] = [
   punto({ id: "a", nombre: "Punto demo 01", tipo: "Reciclaje", direccion: "Calle Uno", codigoPostal: "11001", lat: 12.14, lng: -86.25, telefono: "+505 2255 0100" }),
   punto({ id: "b", nombre: "Punto demo 02", tipo: "Información", direccion: "Calle Dos", codigoPostal: "11002", lat: 12.2, lng: -86.3 }),
