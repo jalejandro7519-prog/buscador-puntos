@@ -56,6 +56,8 @@ function iframeHtml(): Plugin {
 export default defineConfig(({ mode }) => {
   const embed = mode === "embed";
   return {
+    // Ruta base: «/» por defecto; en GitHub Pages se compila con VITE_BASE=/nombre-del-repositorio/
+    base: embed ? "/" : (process.env.VITE_BASE ?? "/"),
     plugins: [react(), ...(embed ? [iframeHtml()] : [precargarMapa()])],
     css: embed ? { postcss: { plugins: [tailwindcss(), autoprefixer(), remAPx] } } : undefined,
     define: embed ? { "process.env.NODE_ENV": JSON.stringify("production") } : undefined,

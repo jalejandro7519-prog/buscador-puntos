@@ -31,6 +31,45 @@ Resultado de `npm run build` (carpeta `dist/`):
 | `dist/embed/iframe.html` | Alternativa con `<iframe>` si el gestor de contenidos filtra scripts |
 | `dist/demo/pagina-anfitriona.html` | Web de ejemplo con CSS agresivo que incrusta el widget con dos líneas |
 
+## Previsualización online
+
+Cada `push` a `master` compila y publica una demo en **GitHub Pages**: `https://<usuario>.github.io/buscador-puntos/`
+(workflow `.github/workflows/previsualizacion.yml`). Para activarla una sola vez: *Settings → Pages → Build and deployment → Source: **GitHub Actions***.
+
+- Buscador público: `…/buscador-puntos/` · Panel: `…/buscador-puntos/#/admin` (PIN de prueba **1234**).
+- Página anfitriona con el widget incrustado: `…/buscador-puntos/demo/pagina-anfitriona.html`.
+- Es solo una demo: datos DEMO y PIN de prueba público. En producción se compila con el PIN real (ver «Panel de administración»).
+
+## Qué está simulado y qué es real
+
+No hay backend, correos, pagos ni WhatsApp (están fuera de alcance). Lo único «de mentira» son los datos y el paso de publicar:
+
+| Parte | Estado |
+|---|---|
+| **Datos** (`public/puntos.json`, hojas de ejemplo) | **DEMO**: 24 puntos ficticios («Punto demo 01…») alrededor de Managua. Hay que sustituirlos por los reales. |
+| **Publicar cambios** | **Manual por diseño**: el panel descarga `puntos.json` y alguien lo sube al servidor. No hay ningún servidor que lo reciba (ver «Cómo se publican los cambios»). |
+| **Acceso al panel (PIN)** | **Barrera de cortesía** en el cliente, no autenticación real. |
+| Mapa y teselas | Reales (OpenStreetMap, sin API key). Necesitan conexión. |
+| «Cerca de mí» | Real (geolocalización del navegador; no se envía a ningún servidor). |
+| «Cómo llegar» | Real: abre Google Maps (Android/escritorio) o Apple Maps (iOS) con las coordenadas del punto. |
+| Búsqueda, filtros, importación CSV/Excel, edición, exportación | Reales y funcionando; todo en el navegador. |
+
+## Datos de ejemplo y cómo reiniciarlos
+
+Los datos de ejemplo vienen precargados en `public/puntos.json` y se regeneran con `node scripts/generar-demo.mjs`
+(también crea `ejemplo-hoja.csv` y `ejemplo-hoja-con-errores.csv`). La app guarda estado en el navegador con tres claves de `localStorage`/`sessionStorage`:
+
+| Clave | Qué guarda |
+|---|---|
+| `buscador-puntos:borrador:v1` | Borrador del panel (lo que se ha editado y no está publicado) |
+| `buscador-puntos:cache:v1` | Copia de la última lista cargada por el buscador público |
+| `buscador-puntos:admin:v1` (sessionStorage) | Sesión del panel |
+
+**Para reiniciar a los datos de ejemplo**, cualquiera de estas opciones:
+1. En `/admin`: botón **«Descartar borrador»** (vuelve al `puntos.json` publicado).
+2. En el navegador: *F12 → Application → Local Storage → Clear* (o ejecutar `localStorage.clear()` en la consola) y recargar.
+3. Para volver a generar los datos DEMO originales: `node scripts/generar-demo.mjs` y recompilar.
+
 ## Cómo se publican los cambios
 
 **Limitación importante.** `localStorage` es propio de cada navegador: lo que se edite en el panel solo existe
