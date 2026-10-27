@@ -1,0 +1,13 @@
+﻿Nombre,Tipo,Dirección,Código postal,Ciudad,Teléfono,Horario,Latitud,Longitud,Estado,Motivo cierre,Reapertura prevista
+Punto demo 01,Punto de información,"Calle Demo 1, Altamira",11001,Altamira,+505 2255 0100,L-V 8:00-16:00,12.1335,-86.2594,abierto,,
+Punto demo 02,Punto de reciclaje,"Calle Demo 2, Linda Vista",11002,Linda Vista,+505 2255 0101,L-S 9:00-13:00 y 15:00-19:00,12.1491,-86.2745,abierto,,
+Punto demo 03,Punto de atención,"Calle Demo 3, Bolonia",11003,Bolonia,+505 2255 0102,Todos los días 7:00-21:00,12.1227,-86.2336,abierto,,
+Punto demo 04,Punto de recogida,"Calle Demo 4, Reparto Schick",11004,Reparto Schick,+505 2255 0103,"L, X y V 10:00-14:00",12.1064,-86.2677,cerrado temporal,Obras en el local,2026-11-15
+Punto demo 05,Punto de información,"Calle Demo 5, Villa Fontana",11005,Villa Fontana,+505 2255 0104,L-V 8:00-16:00,"12,165","-86,2418",abierto,,
+Punto demo 31 (coma decimal),Punto de información,"Calle Demo 31, Altamira",11001,Altamira,,L-V 8:00-16:00,"12,1364","-86,2510",abierto,,
+Punto demo 32 (sin coordenadas),Punto de reciclaje,"Calle Demo 32, Bolonia",11003,Bolonia,,,,,abierto,,
+Punto demo 33 (lat. ilegible),Punto de atención,"Calle Demo 33, Linda Vista",11002,Linda Vista,,,doce coma uno,-86.27,abierto,,
+Punto demo 34 (intercambiadas fuera de rango),Punto de recogida,"Calle Demo 34, Altamira",11001,Altamira,,,-86.2511,125.5,abierto,,
+Punto demo 35 (intercambiadas),Punto de información,"Calle Demo 35, Bolonia",11003,Bolonia,,,-86.2511,12.1364,abierto,,
+,Punto de reciclaje,"Calle Demo 36, Villa Fontana",11005,Villa Fontana,,,12.1651,-86.2402,abierto,,
+Punto demo 37 (con espacios),Punto de atención,"Calle Demo 37, Altamira",11001,Altamira,,, 12.1390 , -86.2540 ,cerrado temporal,Obras,

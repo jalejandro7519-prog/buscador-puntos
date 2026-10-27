@@ -48,6 +48,7 @@ export default defineConfig(({ mode }) => {
           },
         }
       : { target: "es2020" },
+    server: { watch: { usePolling: true, interval: 300 } },
     test: {
       environment: "jsdom",
       setupFiles: ["./vitest.setup.ts"],

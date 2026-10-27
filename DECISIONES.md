@@ -19,3 +19,13 @@ Registro de las decisiones tomadas donde el encargo no definía un valor. Se man
 - **«Cómo llegar»**: la URL solo lleva coordenadas (exactas); la dirección va en la etiqueta accesible del enlace (`aria-label`). Android/escritorio/por defecto: Google Maps; iOS (incluido iPadOS como «Mac táctil»): Apple Maps.
 - **Modelo**: `Punto` es una interfaz explícita; el esquema zod se comprueba en compilación contra ella. Valores vacíos opcionales (`""`) se normalizan a `undefined`.
 - **Carga de `puntos.json`**: se acepta también un array directo. Ids duplicados descartan el segundo punto. Versión distinta de 1 → error de carga (se usa la caché).
+
+## Fase 2 – Vista pública
+
+- **Umbral de la rejilla**: el encargo habla de «≥ 1024 px», pero también de que el widget se adapte al ancho de su contenedor y no de la ventana. Se usa una *container query*: listado (380 px) + mapa lado a lado cuando el contenedor mide **≥ 720 px**; por debajo, mapa arriba (≈ 40 vh, entre 240 y 360 px) y listado debajo. Con 1024 px de umbral, una columna de contenido típica de un CMS (800–900 px) nunca vería la versión de escritorio.
+- **Altura (`data-altura`)**: solo rige en el modo lado a lado (el listado hace scroll dentro). En modo apilado la altura es automática y la página hace scroll: un mapa de 40 vh más un listado no caben en 600 px.
+- **Cerrado temporalmente**: «Cómo llegar» pasa a ser un `<button disabled>` (no un enlace) con etiqueta accesible «no disponible: cerrado temporalmente»; el teléfono sigue siendo un enlace `tel:`. Fondo gris y texto `#4B5563` (contraste AA). Fechas de reapertura en formato largo («15 de noviembre de 2026»), leídas en UTC para no retroceder un día en zonas horarias de América.
+- **Caché**: la clave `buscador-puntos:cache:v1` guarda también la `src` de la que viene; si cambia el `data-src`, la caché de otra fuente no se usa. Dos widgets con `src` distintas en la misma página se pisan la caché (solo pierden la aceleración del primer pintado).
+- **Errores**: sin datos ni caché → mensaje con «Reintentar»; con caché → se muestra la última lista y un aviso discreto con «Reintentar». Los puntos inválidos se descartan solo en consola (el aviso visible será del panel).
+- **Debounce** de 150 ms en la caja de búsqueda; al vaciar con «Quitar búsqueda y filtros» el listado vuelve tras ese mismo intervalo.
+- **Accesibilidad**: `lang="es"`, `<ul>` semántico, contador en `role="status"` (aria-live polite), filtros como `aria-pressed`, `useId` para etiquetas (válido con dos instancias).
