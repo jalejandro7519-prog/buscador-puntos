@@ -8,6 +8,9 @@ const Admin = lazy(() => import("./pages/Admin"));
 
 const esAdmin = /\/admin\/?$/.test(location.pathname) || location.hash.startsWith("#/admin");
 
+// Cambiar solo el #… en la barra de direcciones no recarga la página: se recarga para elegir la pantalla.
+window.addEventListener("hashchange", () => location.reload());
+
 const raiz = document.getElementById("root");
 if (raiz) {
   createRoot(raiz).render(
