@@ -123,8 +123,10 @@ body {
     flex-wrap: wrap;
     gap: 8px;
   }
-  .bp-input {
+  .bp-busqueda .bp-input {
     flex: 1 1 180px;
+  }
+  .bp-input {
     min-width: 0;
     min-height: 44px;
     padding: 8px 12px;

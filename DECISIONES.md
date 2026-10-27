@@ -41,3 +41,16 @@ Registro de las decisiones tomadas donde el encargo no definía un valor. Se man
 - **Agrupación (> 300 puntos)**: agrupación propia por celdas de 60 px en proyección Web Mercator (`lib/agrupar.ts`, ≈ 0,4 KB gzip, `import()` dinámico solo si se supera el umbral) en lugar de `leaflet.markercluster`, que exige `window.L` global y añade ~10 KB. Por encima del zoom 16 no se agrupa.
 - **Medición**: el mapa deja `performance.mark("bp:mapa-listo")` y `"bp:mapa-teselas"` (primeras teselas pintadas).
 - **Filtros en móvil**: una sola fila desplazable en contenedores estrechos para que el mapa quede visible sin hacer scroll.
+
+## Fase 4 – Panel de administración
+
+- **Acceso**: ruta `/admin` (o `#/admin` si el servidor no reescribe rutas). PIN en `VITE_ADMIN_PIN`; sin definir, en desarrollo vale `1234` y en producción el panel se deshabilita. Sesión en `sessionStorage`. El PIN va dentro del bundle: es una barrera de cortesía, no seguridad (documentado en el README).
+- **Borrador**: no existe hasta el primer cambio; mientras tanto se trabaja sobre `puntos.json`. «Hay cambios sin publicar» compara contenido por `id`, **ignorando el orden y `actualizadoEn`**, así que revertir un cambio a mano también quita el aviso.
+- **Deshacer**: pila de 20 niveles (importaciones, altas, ediciones, borrados y cierres/reaperturas son cada uno un nivel). «Descartar borrador» vacía la pila.
+- **`actualizadoEn`**: lo pone la app al guardar un punto; al importar, un punto idéntico al existente conserva su fecha (reimportar la misma hoja no genera cambios falsos).
+- **Importación – criterios de clasificación**: *válida* = sin problemas; *con aviso* = se importa pero hay algo que revisar (estado desconocido → abierto, fecha de reapertura ilegible → se ignora, id repetido → sufijo `-2`, coordenadas lejos del resto); *con error* = no se importa hasta corregirla (falta nombre/tipo/dirección, coordenadas vacías, ilegibles, fuera de rango o 0,0). El botón importa «válidas + con aviso».
+- **lat/lng intercambiadas**: fuera de rango → error con botón «Intercambiar»; dentro de rango (p. ej. −86,25 / 12,13) → aviso si la fila está a > 20° de la mediana del lote y su inversa a < 10°; el lote necesita ≥ 3 filas con coordenadas para tener referencia.
+- **Formatos**: CSV con coma, punto y coma o tabulador (autodetección), con o sin BOM, UTF-8 o Windows-1252; .xlsx/.xls solo la primera hoja, con valores sin formato (`raw`) para no perder decimales; códigos postales numéricos de Excel pierden ceros a la izquierda (avisar al cliente: guardar la columna como texto). Fechas ISO, `dd/mm/aaaa` o número de serie de Excel.
+- **Exportar a CSV**: mismas cabeceras que acepta la importación (más `Id`), coma como separador y BOM UTF-8; los textos que empiezan por `=`, `@` o `±letra` se protegen con `'` (fórmulas de Excel) y la importación lo deshace.
+- **Confirmaciones**: en línea (`role="alertdialog"`) en lugar de `window.confirm`; el foco empieza en «Cancelar». «Reemplazar todo» es el modo por defecto y siempre pide confirmación.
+- **Código partido**: el panel (con papaparse y el mapa de selección) es un fragmento aparte que solo se descarga en `/admin`; `xlsx` (≈ 160 KB gzip) solo al elegir un Excel.

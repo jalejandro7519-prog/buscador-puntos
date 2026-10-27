@@ -110,8 +110,8 @@ const problemas = [
   fila(["Punto demo 32 (sin coordenadas)", TIPOS[1], "Calle Demo 32", "11003", "Bolonia", "", "", "", "", "abierto", "", ""]),
   // Latitud no numérica
   fila(["Punto demo 33 (lat. ilegible)", TIPOS[2], "Calle Demo 33", "11002", "Linda Vista", "", "", "doce coma uno", "-86.27", "abierto", "", ""]),
-  // Fuera de rango, con lat/lng intercambiadas
-  fila(["Punto demo 34 (intercambiadas fuera de rango)", TIPOS[3], "Calle Demo 34", "11001", "Altamira", "", "", "-86.2511", "125.5", "abierto", "", ""]),
+  // Latitud fuera de rango (falta el punto decimal)
+  fila(["Punto demo 34 (latitud fuera de rango)", TIPOS[3], "Calle Demo 34", "11001", "Altamira", "", "", "1213.64", "-86.2511", "abierto", "", ""]),
   // Intercambiadas pero dentro de rango (solo se detecta por estar lejos del resto)
   fila(["Punto demo 35 (intercambiadas)", TIPOS[0], "Calle Demo 35", "11003", "Bolonia", "", "", "-86.2511", "12.1364", "abierto", "", ""]),
   // Sin nombre
