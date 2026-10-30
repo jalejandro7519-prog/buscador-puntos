@@ -39,6 +39,20 @@ export function crearPopupDom(punto: Punto, distanciaKm: number | null, platafor
     raiz.append(linea);
   }
 
+  if (punto.resenas && punto.resenas.length > 0) {
+    const detalle = el("details", "bp-resenas");
+    detalle.append(el("summary", "", punto.resenas.length === 1 ? "1 reseña" : `${punto.resenas.length} reseñas`));
+    const lista = el("ul", "bp-resenas-lista");
+    for (const r of punto.resenas) {
+      const item = el("li", "");
+      item.append(el("p", "bp-resena-texto", `«${r.texto}»`));
+      item.append(el("p", "bp-resena-meta", `${r.autor ? `${r.autor}, ` : ""}${formatearFecha(r.fecha)}`));
+      lista.append(item);
+    }
+    detalle.append(lista);
+    raiz.append(detalle);
+  }
+
   const destino = { lat: punto.lat, lng: punto.lng, nombre: punto.nombre, direccion: punto.direccion };
   const acciones = el("div", "bp-ficha-acciones");
   if (cerrado) {

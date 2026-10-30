@@ -112,7 +112,7 @@ si el fichero falla. Al publicar un `puntos.json` nuevo, cada visitante lo verá
 
 - Reconoce cabeceras sin importar tildes ni mayúsculas: `nombre`; `tipo`/`categoría`; `dirección`; `código postal`/`cp`/`codigo_postal`/`zip`;
   `ciudad`/`localidad`/`barrio`; `teléfono`; `horario`; `lat`/`latitud`; `lng`/`lon`/`longitud`; `estado`; y, opcionales,
-  `id`, `motivo cierre`, `reapertura prevista`. El resto de columnas se ignoran (y se indica cuáles).
+  `id`, `motivo cierre`, `reapertura prevista` y `reseñas`. El resto de columnas se ignoran (y se indica cuáles).
 - Admite decimales con coma (`12,1364`) o punto, coordenadas con espacios, CSV con `,` `;` o tabulador, y UTF-8 o Windows-1252.
 - **Vista previa antes de confirmar**: total de filas, válidas, con aviso y con error, con la lista de problemas por fila
   (falta nombre, coordenadas vacías o fuera de rango, lat/lng intercambiadas…). Una fila sin coordenadas válidas **no se pierde
@@ -121,6 +121,16 @@ si el fichero falla. Al publicar un `puntos.json` nuevo, cada visitante lo verá
 - En Excel, guardar la columna del código postal como **texto** (si es numérica, Excel pierde los ceros a la izquierda).
 - Hojas de prueba: [`public/ejemplo-hoja.csv`](public/ejemplo-hoja.csv) (24 filas válidas) y
   [`public/ejemplo-hoja-con-errores.csv`](public/ejemplo-hoja-con-errores.csv) (coma decimal, coordenadas vacías, ilegibles, fuera de rango, intercambiadas, sin nombre).
+
+## Reseñas breves por punto
+
+Cada punto puede llevar hasta **5 reseñas breves** (máx. 280 caracteres cada una, con autor opcional y fecha). Las escribe y
+gestiona el personal desde el panel; no hay envío público de reseñas, porque eso exigiría un backend (fuera de alcance).
+
+- **Panel**: al editar un punto, sección «Reseñas breves» → escribir, «Añadir reseña» / «Quitar». La tabla muestra cuántas tiene cada punto.
+- **Ficha pública** (listado y popup del mapa): bloque plegado «2 reseñas» que se abre con un clic; el texto se pinta siempre como texto, nunca como HTML.
+- **Modelo** (`puntos.json`): `resenas?: [{ "id": "…", "texto": "…", "autor": "…", "fecha": "2026-10-05T10:00:00.000Z" }]`. Una reseña inválida se descarta sola, sin afectar al punto.
+- **Hoja de cálculo**: columna opcional `Reseñas` (alias `opiniones`, `comentarios`) con los textos separados por ` || ` en **una** celda. La hoja no lleva autor ni fecha: si el texto de una reseña ya existía, se conservan su autor y fecha. **Una celda vacía no borra las reseñas existentes** (se quitan desde el panel).
 
 ## Incrustarlo en la web del ayuntamiento
 

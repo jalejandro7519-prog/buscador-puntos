@@ -1,9 +1,9 @@
-﻿Nombre,Tipo,Dirección,Código postal,Ciudad,Teléfono,Horario,Latitud,Longitud,Estado,Motivo cierre,Reapertura prevista
-Punto demo 01,Punto de información,Calle Demo 1,11001,Altamira,+505 2255 0100,L-V 8:00-16:00,12.1335,-86.2594,abierto,,
-Punto demo 02,Punto de reciclaje,Calle Demo 2,11002,Linda Vista,+505 2255 0101,L-S 9:00-13:00 y 15:00-19:00,12.1491,-86.2745,abierto,,
-Punto demo 03,Punto de atención,Calle Demo 3,11003,Bolonia,+505 2255 0102,Todos los días 7:00-21:00,12.1227,-86.2336,abierto,,
-Punto demo 04,Punto de recogida,Calle Demo 4,11004,Reparto Schick,+505 2255 0103,"L, X y V 10:00-14:00",12.1064,-86.2677,cerrado temporal,Obras en el local,2026-11-15
-Punto demo 05,Punto de información,Calle Demo 5,11005,Villa Fontana,+505 2255 0104,L-V 8:00-16:00,"12,165","-86,2418",abierto,,
+﻿Nombre,Tipo,Dirección,Código postal,Ciudad,Teléfono,Horario,Latitud,Longitud,Estado,Motivo cierre,Reapertura prevista,Reseñas
+Punto demo 01,Punto de información,Calle Demo 1,11001,Altamira,+505 2255 0100,L-V 8:00-16:00,12.1335,-86.2594,abierto,,,Atención rápida y personal amable. || Cómodo para llegar a pie desde el centro.
+Punto demo 02,Punto de reciclaje,Calle Demo 2,11002,Linda Vista,+505 2255 0101,L-S 9:00-13:00 y 15:00-19:00,12.1491,-86.2745,abierto,,,
+Punto demo 03,Punto de atención,Calle Demo 3,11003,Bolonia,+505 2255 0102,Todos los días 7:00-21:00,12.1227,-86.2336,abierto,,,
+Punto demo 04,Punto de recogida,Calle Demo 4,11004,Reparto Schick,+505 2255 0103,"L, X y V 10:00-14:00",12.1064,-86.2677,cerrado temporal,Obras en el local,2026-11-15,
+Punto demo 05,Punto de información,Calle Demo 5,11005,Villa Fontana,+505 2255 0104,L-V 8:00-16:00,"12,165","-86,2418",abierto,,,
 Punto demo 31 (coma decimal),Punto de información,Calle Demo 31,11001,Altamira,,L-V 8:00-16:00,"12,1364","-86,2510",abierto,,
 Punto demo 32 (sin coordenadas),Punto de reciclaje,Calle Demo 32,11003,Bolonia,,,,,abierto,,
 Punto demo 33 (lat. ilegible),Punto de atención,Calle Demo 33,11002,Linda Vista,,,doce coma uno,-86.27,abierto,,

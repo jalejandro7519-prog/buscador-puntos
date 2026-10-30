@@ -309,6 +309,42 @@ body {
     margin-top: 8px;
   }
 
+  /* ---------- Reseñas ---------- */
+  .bp-resenas {
+    margin: 4px 0 0;
+    font-size: 15px;
+  }
+  .bp-resenas summary {
+    display: flex;
+    align-items: center;
+    min-height: 44px;
+    font-weight: 600;
+    color: theme("colors.primario");
+    cursor: pointer;
+  }
+  .bp-resenas-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 0 0 4px;
+    padding: 0;
+    list-style: none;
+  }
+  .bp-resenas-lista li {
+    padding-left: 10px;
+    border-left: 3px solid #9ca3af;
+  }
+  .bp-resenas-lista p {
+    margin: 0;
+  }
+  .bp-resena-meta {
+    font-size: 14px;
+    color: #4b5563;
+  }
+  .bp-mapa .leaflet-popup-content .bp-popup .bp-resenas-lista p {
+    margin: 0;
+  }
+
   /* ---------- Estados ---------- */
   .bp-vacio {
     padding: 16px;

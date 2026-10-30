@@ -22,3 +22,12 @@ export function idUnico(base: string, usados: ReadonlySet<string>): string {
   while (usados.has(`${base}-${n}`)) n++;
   return `${base}-${n}`;
 }
+
+/** JSON con las claves ordenadas a cualquier profundidad: sirve para comparar contenidos. */
+export function serializarEstable(valor: unknown): string {
+  return JSON.stringify(valor, (_clave, v: unknown) =>
+    v && typeof v === "object" && !Array.isArray(v)
+      ? Object.fromEntries(Object.entries(v as Record<string, unknown>).sort(([a], [b]) => a.localeCompare(b)))
+      : v,
+  );
+}

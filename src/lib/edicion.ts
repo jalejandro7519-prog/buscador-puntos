@@ -1,11 +1,11 @@
 import Papa from "papaparse";
-import { crearArchivo, puntoSchema, type Punto } from "./esquema";
+import { MAX_RESENAS, crearArchivo, puntoSchema, type Punto, type Resena } from "./esquema";
 import { parsearFecha, parsearNumero } from "./importar";
-import { generarId, idUnico } from "./texto";
+import { generarId, idUnico, serializarEstable } from "./texto";
 
 /** Contenido de un punto sin la fecha de actualización (para comparar). */
 function contenido({ actualizadoEn: _fecha, ...resto }: Punto): string {
-  return JSON.stringify(resto, Object.keys(resto).sort());
+  return serializarEstable(resto);
 }
 
 /** ¿Difiere el borrador de lo publicado? Ignora el orden y la fecha de actualización. */
@@ -66,6 +66,7 @@ export interface CamposFormulario {
   cerrado: boolean;
   motivoCierre: string;
   reaperturaPrevista: string;
+  resenas: Resena[];
 }
 
 export type ErroresFormulario = Partial<Record<keyof CamposFormulario, string>>;
@@ -84,6 +85,7 @@ export function formularioVacio(): CamposFormulario {
     cerrado: false,
     motivoCierre: "",
     reaperturaPrevista: "",
+    resenas: [],
   };
 }
 
@@ -101,6 +103,7 @@ export function formularioDesdePunto(p: Punto): CamposFormulario {
     cerrado: p.estado === "cerrado_temporal",
     motivoCierre: p.motivoCierre ?? "",
     reaperturaPrevista: p.reaperturaPrevista ?? "",
+    resenas: p.resenas ?? [],
   };
 }
 
@@ -155,6 +158,7 @@ export function puntoDesdeFormulario(
     estado: campos.cerrado ? "cerrado_temporal" : "abierto",
     ...(campos.cerrado && campos.motivoCierre.trim() ? { motivoCierre: campos.motivoCierre.trim() } : {}),
     ...(reapertura ? { reaperturaPrevista: reapertura } : {}),
+    ...(campos.resenas.length > 0 ? { resenas: campos.resenas.slice(0, MAX_RESENAS) } : {}),
     actualizadoEn: ahora,
   };
   const r = puntoSchema.safeParse(candidato);
@@ -168,6 +172,9 @@ export function puntoDesdeFormulario(
 export function aJson(puntos: readonly Punto[], generadoEn = new Date().toISOString()): string {
   return JSON.stringify(crearArchivo([...puntos], generadoEn), null, 2) + "\n";
 }
+
+/** Las reseñas van en UNA celda de la hoja, separadas por « || » (se pierden autor y fecha). */
+export const SEPARADOR_RESENAS = " || ";
 
 /** Evita que Excel interprete un texto como fórmula (=, @, +x, -x). Las coordenadas no se tocan. */
 function protegerFormula(valor: string): string {
@@ -190,6 +197,7 @@ export function aCsv(puntos: readonly Punto[]): string {
     Estado: p.estado === "cerrado_temporal" ? "cerrado temporal" : "abierto",
     "Motivo cierre": protegerFormula(p.motivoCierre ?? ""),
     "Reapertura prevista": p.reaperturaPrevista ?? "",
+    Reseñas: protegerFormula((p.resenas ?? []).map((r) => r.texto).join(SEPARADOR_RESENAS)),
   }));
   // BOM para que Excel reconozca UTF-8.
   return "﻿" + Papa.unparse(filas, { newline: "\r\n" });

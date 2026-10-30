@@ -143,7 +143,14 @@ export function TablaPuntos({ puntos, onEditar, onBorrar, onCierre }: Props) {
                 const cerrado = p.estado === "cerrado_temporal";
                 return (
                   <tr key={p.id} className={`border-b border-gray-200 align-top ${cerrado ? "bg-gray-100 text-gray-600" : ""}`}>
-                    <th scope="row" className="p-2 font-semibold">{p.nombre}</th>
+                    <th scope="row" className="p-2 font-semibold">
+                      {p.nombre}
+                      {p.resenas && p.resenas.length > 0 && (
+                        <span className="block text-sm font-normal">
+                          {p.resenas.length === 1 ? "1 reseña" : `${p.resenas.length} reseñas`}
+                        </span>
+                      )}
+                    </th>
                     <td className="p-2">{p.tipo}</td>
                     <td className="p-2">{p.direccion}</td>
                     <td className="p-2">{p.codigoPostal}</td>

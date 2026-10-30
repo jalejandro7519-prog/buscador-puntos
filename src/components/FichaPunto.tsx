@@ -2,6 +2,7 @@ import { etiquetaComoLlegar, urlComoLlegar, type Plataforma } from "../lib/direc
 import type { Punto } from "../lib/esquema";
 import { formatearDistancia } from "../lib/geo";
 import { formatearFecha, hrefTelefono } from "../lib/utiles";
+import { Resenas } from "./Resenas";
 
 interface Props {
   punto: Punto;
@@ -67,6 +68,8 @@ export function FichaPunto({ punto, distanciaKm, plataforma, seleccionado = fals
           </a>
         </p>
       )}
+
+      <Resenas resenas={punto.resenas} />
 
       <div className="bp-ficha-acciones">
         {cerrado ? (

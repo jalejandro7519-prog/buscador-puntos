@@ -1,6 +1,6 @@
 import Papa from "papaparse";
-import type { EstadoPunto, Punto } from "./esquema";
-import { generarId, idUnico, normalizar } from "./texto";
+import { MAX_RESENAS, MAX_TEXTO_RESENA, type EstadoPunto, type Punto, type Resena } from "./esquema";
+import { generarId, idUnico, normalizar, serializarEstable } from "./texto";
 
 /* ------------------------------------------------------------------ */
 /* Cabeceras de la hoja                                                */
@@ -19,7 +19,8 @@ export type CampoHoja =
   | "lng"
   | "estado"
   | "motivoCierre"
-  | "reaperturaPrevista";
+  | "reaperturaPrevista"
+  | "resenas";
 
 /** Alias aceptados por campo, ya sin tildes, mayúsculas, espacios ni signos. */
 const ALIAS: Record<CampoHoja, string[]> = {
@@ -36,6 +37,7 @@ const ALIAS: Record<CampoHoja, string[]> = {
   estado: ["estado"],
   motivoCierre: ["motivocierre", "motivodelcierre", "motivo"],
   reaperturaPrevista: ["reaperturaprevista", "reapertura", "fechareapertura"],
+  resenas: ["resenas", "resena", "opiniones", "comentarios"],
 };
 
 export const CAMPOS_OBLIGATORIOS: CampoHoja[] = ["nombre", "tipo", "direccion", "lat", "lng"];
@@ -55,6 +57,7 @@ export const ETIQUETA_CAMPO: Record<CampoHoja, string> = {
   estado: "Estado",
   motivoCierre: "Motivo cierre",
   reaperturaPrevista: "Reapertura prevista",
+  resenas: "Reseñas",
 };
 
 const clave = (cabecera: string) => normalizar(cabecera).replace(/[^a-z0-9]/g, "");
@@ -266,6 +269,15 @@ export function analizarFilas(entradas: readonly EntradaFila[], ahora = new Date
       const id = idUnico(base, usados);
       usados.add(id);
       if (id !== base) aviso(`El id «${base}» ya existía en la hoja: se usa «${id}».`, "id");
+      const textos = campos.resenas
+        .split("||")
+        .map((t) => t.trim())
+        .filter(Boolean);
+      if (textos.length > MAX_RESENAS) aviso(`Hay ${textos.length} reseñas: solo se importan las ${MAX_RESENAS} primeras.`, "resenas");
+      const resenas: Resena[] = textos.slice(0, MAX_RESENAS).map((texto, i) => {
+        if (texto.length > MAX_TEXTO_RESENA) aviso(`La reseña ${i + 1} supera los ${MAX_TEXTO_RESENA} caracteres: se recorta.`, "resenas");
+        return { id: `${id}-r${i + 1}`, texto: texto.slice(0, MAX_TEXTO_RESENA), fecha: ahora };
+      });
       punto = {
         id,
         nombre: campos.nombre,
@@ -280,6 +292,7 @@ export function analizarFilas(entradas: readonly EntradaFila[], ahora = new Date
         estado,
         ...(campos.motivoCierre ? { motivoCierre: campos.motivoCierre } : {}),
         ...(reapertura ? { reaperturaPrevista: reapertura } : {}),
+        ...(resenas.length > 0 ? { resenas } : {}),
         actualizadoEn: ahora,
       };
     }
@@ -370,7 +383,18 @@ export function puntosImportables(filas: readonly FilaImportada[]): Punto[] {
   return filas.flatMap((f) => (f.punto ? [f.punto] : []));
 }
 
-const sinFecha = ({ actualizadoEn: _fecha, ...resto }: Punto) => JSON.stringify(resto);
+const sinFecha = ({ actualizadoEn: _fecha, ...resto }: Punto) => serializarEstable(resto);
+
+/**
+ * La hoja solo trae el texto de las reseñas: si coinciden con las existentes se conservan (con su autor
+ * y fecha); si la celda viene vacía, las reseñas existentes se mantienen (se borran desde el panel).
+ */
+function reutilizarResenas(nuevo: Punto, existente: Punto | undefined): Punto {
+  if (!existente?.resenas?.length) return nuevo;
+  if (!nuevo.resenas?.length) return { ...nuevo, resenas: existente.resenas };
+  const previas = new Map(existente.resenas.map((r) => [r.texto, r]));
+  return { ...nuevo, resenas: nuevo.resenas.map((r) => previas.get(r.texto) ?? r) };
+}
 
 /** Si un punto no ha cambiado respecto al existente conserva su fecha de actualización. */
 function conservarFecha(nuevo: Punto, existente: Punto | undefined): Punto {
@@ -383,12 +407,12 @@ function conservarFecha(nuevo: Punto, existente: Punto | undefined): Punto {
  */
 export function aplicarImportacion(actuales: readonly Punto[], nuevos: readonly Punto[], modo: ModoImportacion): Punto[] {
   const porId = new Map(actuales.map((p) => [p.id, p]));
-  if (modo === "reemplazar") return nuevos.map((n) => conservarFecha(n, porId.get(n.id)));
+  if (modo === "reemplazar") return nuevos.map((n) => conservarFecha(reutilizarResenas(n, porId.get(n.id)), porId.get(n.id)));
 
   const nuevosPorId = new Map(nuevos.map((n) => [n.id, n]));
   const actualizados = actuales.map((a) => {
     const n = nuevosPorId.get(a.id);
-    return n ? conservarFecha(n, a) : a;
+    return n ? conservarFecha(reutilizarResenas(n, a), a) : a;
   });
   return [...actualizados, ...nuevos.filter((n) => !porId.has(n.id))];
 }

@@ -21,6 +21,26 @@ const fechaIso = z
   .optional()
   .transform((v) => (v ? v : undefined));
 
+/** Reseñas breves por punto, escritas y gestionadas desde el panel (no hay envío público: no hay backend). */
+export const MAX_RESENAS = 5;
+export const MAX_TEXTO_RESENA = 280;
+
+export const resenaSchema = z.object({
+  id: textoObligatorio,
+  texto: texto.min(1, "obligatorio").max(MAX_TEXTO_RESENA, "máximo " + MAX_TEXTO_RESENA + " caracteres"),
+  autor: textoOpcional,
+  fecha: z.string().default(() => new Date().toISOString()),
+});
+
+/** Una reseña inválida se descarta sola (el punto y las demás reseñas se conservan). */
+const resenas = z.preprocess(
+  (v) => (Array.isArray(v) ? v.filter((r) => resenaSchema.safeParse(r).success).slice(0, MAX_RESENAS) : undefined),
+  z
+    .array(resenaSchema)
+    .optional()
+    .transform((v) => (v && v.length > 0 ? v : undefined)),
+);
+
 export const puntoSchema = z.object({
   id: textoObligatorio,
   nombre: textoObligatorio,
@@ -35,8 +55,18 @@ export const puntoSchema = z.object({
   estado: z.enum(ESTADOS).default("abierto"),
   motivoCierre: textoOpcional,
   reaperturaPrevista: fechaIso,
+  resenas,
   actualizadoEn: z.string().default(() => new Date().toISOString()),
 });
+
+export interface Resena {
+  id: string;
+  /** Texto breve (máx. 280 caracteres). */
+  texto: string;
+  autor?: string;
+  /** Fecha-hora ISO. */
+  fecha: string;
+}
 
 export interface Punto {
   /** Estable; si la hoja no lo trae, se genera de forma determinista (slug nombre+cp). */
@@ -57,6 +87,8 @@ export interface Punto {
   motivoCierre?: string;
   /** Fecha ISO opcional. */
   reaperturaPrevista?: string;
+  /** Reseñas breves gestionadas desde el panel (máx. 5). */
+  resenas?: Resena[];
   /** Fecha-hora ISO; la pone la app. */
   actualizadoEn: string;
 }

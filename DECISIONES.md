@@ -74,3 +74,14 @@ Registro de las decisiones tomadas donde el encargo no definía un valor. Se man
 - **Accesibilidad**: se añadió un `<h2>` oculto «Puntos encontrados» para que los títulos de las fichas (`<h3>`) no salten de nivel; marcadores con caja táctil de 40 px (el dibujo mide 30 px). Queda un aviso de Lighthouse (`target-size`) por marcadores solapados a zoom bajo con los datos de demo; la lista es la alternativa textual completa. No se ha probado con lector de pantalla.
 - **Datos DEMO**: coordenadas inventadas alrededor del centro de Managua (12,136; −86,251) y nombres claramente ficticios («Punto demo 01»…). Los barrios (Altamira, Bolonia…) solo sirven de etiqueta; las direcciones («Calle Demo 1») no existen.
 - **Pendiente de decidir por el cliente**: ver el resumen final y el README.
+
+## Fase 7 – Reseñas breves por punto (tras la revisión de Kodarvia)
+
+- **Origen**: el encargo original no las mencionaba, pero la revisión indicó que el alcance contemplaba «reseñas breves por punto gestionadas desde el panel» y ofreció sumarlas. Se han sumado.
+- **Interpretación**: reseñas *editoriales*, escritas y mantenidas por quien administra el panel. Las enviadas por el público necesitan un backend (moderación, anti-spam), que el encargo deja fuera de alcance.
+- **Límites**: máx. 5 por punto y 280 caracteres por reseña (breves; la ficha sigue siendo breve). Autor opcional. Fecha de alta automática.
+- **Presentación**: bloque `<details>` plegado («2 reseñas») para no alargar las fichas; en el popup del mapa se construye con `textContent`. Los puntos cerrados conservan sus reseñas.
+- **Datos**: `resenas` opcional en `Punto`; una reseña inválida se descarta sola. Sin reseñas el campo no existe (los `puntos.json` anteriores siguen valiendo).
+- **Hoja**: columna `Reseñas` con textos separados por ` || ` (solo texto). Al reimportar se reutilizan autor y fecha de las que no cambian; una celda vacía **no** borra las existentes, para que reimportar una hoja antigua no destruya reseñas escritas en el panel.
+- **Comparación de cambios**: la detección de «cambios sin publicar» ahora serializa con claves ordenadas a cualquier profundidad (antes solo ordenaba el primer nivel, lo que habría ocultado cambios dentro de las reseñas).
+- **Datos DEMO**: 3 puntos con 4 reseñas ficticias en total.

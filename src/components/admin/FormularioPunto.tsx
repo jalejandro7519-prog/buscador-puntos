@@ -8,6 +8,7 @@ import {
 } from "../../lib/edicion";
 import type { Punto } from "../../lib/esquema";
 import { parsearNumero } from "../../lib/importar";
+import { EditorResenas } from "./EditorResenas";
 
 const MapaSelector = lazy(() => import("./MapaSelector"));
 
@@ -143,6 +144,8 @@ export function FormularioPunto({ existentes, editando, tipos, onGuardar, onCanc
           </div>
         )}
       </fieldset>
+
+      <EditorResenas resenas={campos.resenas} onCambio={(r) => poner("resenas", r)} />
 
       <div className="mt-4 flex flex-wrap gap-2">
         <button type="submit" className="bp-boton bp-boton-lleno">

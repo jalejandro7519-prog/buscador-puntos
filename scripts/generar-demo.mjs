@@ -21,6 +21,15 @@ const CERRADOS = {
 const SIN_TELEFONO = new Set([7, 15, 22]);
 const SIN_HORARIO = new Set([9, 20]);
 const FILA_COMA_DECIMAL = 4;
+// Reseñas breves de ejemplo (ficticias), por posición del punto.
+const RESENAS = {
+  0: [
+    { texto: "Atención rápida y personal amable.", autor: "Vecina de la zona", fecha: "2026-10-05T10:00:00.000Z" },
+    { texto: "Cómodo para llegar a pie desde el centro.", fecha: "2026-10-12T16:30:00.000Z" },
+  ],
+  5: [{ texto: "Horario cómodo por las tardes.", autor: "Usuario habitual", fecha: "2026-09-28T18:00:00.000Z" }],
+  12: [{ texto: "Fácil de encontrar y bien señalizado.", fecha: "2026-10-20T09:15:00.000Z" }],
+};
 
 const slug = (...partes) =>
   partes
@@ -54,6 +63,15 @@ const puntos = Array.from({ length: 24 }, (_, i) => {
     p.motivoCierre = cerrado.motivoCierre;
     if (cerrado.reaperturaPrevista) p.reaperturaPrevista = cerrado.reaperturaPrevista;
   }
+  const resenas = RESENAS[i];
+  if (resenas) {
+    p.resenas = resenas.map((r, k) => ({
+      id: `${p.id}-r${k + 1}`,
+      texto: r.texto,
+      ...(r.autor ? { autor: r.autor } : {}),
+      fecha: r.fecha,
+    }));
+  }
   return p;
 });
 
@@ -72,6 +90,7 @@ const CABECERA = [
   "Estado",
   "Motivo cierre",
   "Reapertura prevista",
+  "Reseñas",
 ];
 const celda = (v) => {
   const s = v === undefined ? "" : String(v);
@@ -95,6 +114,7 @@ function filaDePunto(p, i) {
     p.estado === "cerrado_temporal" ? "cerrado temporal" : "abierto",
     p.motivoCierre,
     p.reaperturaPrevista,
+    p.resenas?.map((r) => r.texto).join(" || "),
   ]);
 }
 

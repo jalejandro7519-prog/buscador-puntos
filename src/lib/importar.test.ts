@@ -240,5 +240,5 @@ describe("modos de importación", () => {
 });
 
 function camposBase() {
-  return { id: "", nombre: "X", tipo: "T", direccion: "C", codigoPostal: "", ciudad: "", telefono: "", horario: "", lat: "", lng: "", estado: "", motivoCierre: "", reaperturaPrevista: "" };
+  return { id: "", nombre: "X", tipo: "T", direccion: "C", codigoPostal: "", ciudad: "", telefono: "", horario: "", lat: "", lng: "", estado: "", motivoCierre: "", reaperturaPrevista: "", resenas: "" };
 }
